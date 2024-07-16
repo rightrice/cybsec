@@ -1,7 +1,7 @@
 from scapy.all import sniff, wrpcap, hexdump, conf, get_if_list, get_if_hwaddr
 import time
 import threading
-import keyboard
+from pynput import keyboard
 
 # List to store captured packets
 packets = []
@@ -32,6 +32,12 @@ def start_sniffing(count, full_filter, iface):
     except Exception as e:
         print(f"Error capturing packets: {e}")
 
+def on_press(key):
+    global sniffing
+    if key == keyboard.Key.space:
+        sniffing = False
+        return False  # Stop the listener
+
 def main():
     global sniffing
     # Display available interfaces
@@ -59,9 +65,11 @@ def main():
 
     print("Press spacebar to stop sniffing...")
 
-    # Wait for the spacebar press to stop sniffing
-    keyboard.wait('space')
-    sniffing = False
+    # Start keyboard listener
+    listener = keyboard.Listener(on_press=on_press)
+    listener.start()
+    listener.join()
+
     sniffer_thread.join()
 
     # Save captured packets to a pcap file
