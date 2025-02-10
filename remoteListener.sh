@@ -1,0 +1,1 @@
+nc -lvp YOUR_REMOTE_PORT
